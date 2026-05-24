@@ -1,0 +1,70 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid;
+  transition: all 0.3s;
+}
+
+.dotFuture { background: var(--bg-tertiary); color: var(--text-muted); border-color: var(--border); }
+.dotActive { background: var(--accent-purple); color: white; border-color: var(--accent-purple); animation: pulse 2s ease-in-out infinite; }
+.dotGreen { background: var(--accent-green); color: white; border-color: var(--accent-green); }
+.dotAmber { background: var(--accent-amber); color: white; border-color: var(--accent-amber); }
+.dotRed { background: var(--accent-red); color: white; border-color: var(--accent-red); }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(127, 119, 221, 0.6); }
+  50% { box-shadow: 0 0 0 8px rgba(127, 119, 221, 0); }
+}
+
+.label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  min-width: 16px;
+  background: var(--border);
+  margin-bottom: 22px;
+  transition: background 0.3s;
+}
+
+.connectorDone {
+  background: var(--accent-purple);
+}
+
+@media (max-width: 768px) {
+  .label { font-size: 10px; max-width: 60px; }
+  .step { min-width: 60px; }
+}

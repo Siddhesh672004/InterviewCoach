@@ -1,0 +1,122 @@
+.footer {
+  margin-top: 80px;
+  padding: 64px 0 28px;
+  border-top: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, transparent, rgba(20, 20, 42, 0.5));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 56px;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+
+.brandAccent {
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 20px;
+}
+
+.socials {
+  display: flex;
+  gap: 8px;
+}
+
+.socialLink {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.socialLink:hover {
+  background: var(--bg-glass-strong);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.colTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col a {
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.col a:hover { color: var(--text-primary); }
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.legal {
+  display: flex;
+  gap: 20px;
+}
+
+.legal a {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 880px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .brandCol { grid-column: 1 / -1; }
+}
+
+@media (max-width: 540px) {
+  .grid { grid-template-columns: 1fr; gap: 28px; }
+  .bottom { flex-direction: column; align-items: flex-start; }
+}

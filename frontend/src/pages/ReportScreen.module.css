@@ -1,0 +1,241 @@
+.page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: var(--bg-primary);
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.header h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.gradeCard {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: var(--bg-secondary);
+  border: 2px solid;
+  border-radius: 16px;
+  padding: 32px 40px;
+  justify-content: center;
+}
+
+.gradeGreen { border-color: var(--accent-green); }
+.gradeAmber { border-color: var(--accent-amber); }
+.gradeRed { border-color: var(--accent-red); }
+
+.gradeLetter {
+  font-size: 96px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.gradeGreen .gradeLetter { color: var(--accent-green); }
+.gradeAmber .gradeLetter { color: var(--accent-amber); }
+.gradeRed .gradeLetter { color: var(--accent-red); }
+
+.gradeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gradeScore {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.gradeScore span {
+  font-size: 20px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.gradeLabel {
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.strengthsCard h2 { color: var(--accent-green); }
+.weaknessesCard h2 { color: var(--accent-amber); }
+
+.bulletList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bulletList li {
+  padding-left: 24px;
+  position: relative;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.bulletList li::before {
+  content: "•";
+  position: absolute;
+  left: 8px;
+  color: var(--accent-purple);
+  font-weight: 700;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.table td {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.scoreCell {
+  background: var(--bg-tertiary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: inline-block;
+}
+
+.actionList {
+  list-style: none;
+  counter-reset: action;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actionList li {
+  counter-increment: action;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  padding: 16px 16px 16px 60px;
+  position: relative;
+}
+
+.actionList li::before {
+  content: counter(action);
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-purple);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.actionTip {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.actionResource {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.transcriptToggle {
+  background: transparent;
+  color: var(--accent-purple);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+.transcriptBody {
+  margin-top: 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .gradeCard { flex-direction: column; gap: 16px; padding: 24px; text-align: center; }
+  .gradeLetter { font-size: 72px; }
+  .twoCol { grid-template-columns: 1fr; }
+  .header h1 { font-size: 28px; }
+}

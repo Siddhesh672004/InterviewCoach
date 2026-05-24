@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 80px;
+  width: 100%;
+}
+
+.bar {
+  width: 8px;
+  height: 12px;
+  background: var(--text-muted);
+  border-radius: 4px;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+.speaking .bar {
+  background: var(--accent-purple);
+  animation: wave 0.9s ease-in-out infinite;
+}
+
+.speaking .bar:nth-child(1) { animation-delay: 0s; }
+.speaking .bar:nth-child(2) { animation-delay: 0.1s; }
+.speaking .bar:nth-child(3) { animation-delay: 0.2s; }
+.speaking .bar:nth-child(4) { animation-delay: 0.1s; }
+.speaking .bar:nth-child(5) { animation-delay: 0s; }
+
+@keyframes wave {
+  0%, 100% { height: 12px; }
+  50% { height: 56px; }
+}
+
+.status {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+}
