@@ -11,6 +11,14 @@ import ScoreSidebar from "../components/ScoreSidebar.jsx";
 import ProgressBar from "../components/ProgressBar.jsx";
 import styles from "./InterviewScreen.module.css";
 
+const MODE_LABEL = {
+  quick: "Quick Practice",
+  technical: "Technical",
+  resume_driven: "Resume-Driven",
+  jd_targeted: "JD-Targeted",
+  hr_behavioral: "HR / Behavioral",
+};
+
 export default function InterviewScreen() {
   const navigate = useNavigate();
   const { session, setFinalReport } = useInterview();
@@ -26,12 +34,15 @@ export default function InterviewScreen() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [elapsed, setElapsed] = useState(0);
 
   const synthesis = useSpeechSynthesis();
   const recognition = useSpeechRecognition();
 
   const seededRef = useRef(false);
+  const pendingFirstQuestionRef = useRef(null);
   const lastAnswerRef = useRef("");
+  const startedAtRef = useRef(Date.now());
 
   const speakIfEnabled = (text) => {
     if (voiceEnabled && synthesis.speak) {
@@ -39,13 +50,31 @@ export default function InterviewScreen() {
     }
   };
 
+  // Seed first question + handle the TTS race: if voices haven't loaded yet,
+  // queue the question and speak it as soon as voicesReady flips true.
   useEffect(() => {
     if (seededRef.current || !session?.question) return;
     setMessages([{ type: "ai", content: session.question }]);
     seededRef.current = true;
-    speakIfEnabled(session.question);
+
+    if (!voiceEnabled) return;
+    if (synthesis.voicesReady) {
+      speakIfEnabled(session.question);
+    } else {
+      pendingFirstQuestionRef.current = session.question;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
+
+  useEffect(() => {
+    if (!voiceEnabled) return;
+    if (synthesis.voicesReady && pendingFirstQuestionRef.current) {
+      const q = pendingFirstQuestionRef.current;
+      pendingFirstQuestionRef.current = null;
+      speakIfEnabled(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [synthesis.voicesReady, voiceEnabled]);
 
   useEffect(() => {
     if (recognition.error) {
@@ -59,6 +88,13 @@ export default function InterviewScreen() {
     const t = setTimeout(() => setToast(""), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -140,24 +176,101 @@ export default function InterviewScreen() {
   else if (synthesis.isSpeaking) inputStatus = "AI is speaking...";
   else if (recognition.isListening) inputStatus = "Listening... speak now";
 
+  const fmt = (s) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const r = (s % 60).toString().padStart(2, "0");
+    return `${m}:${r}`;
+  };
+
+  const currentTopic = topics[currentIndex] || "";
+  const liveStatus = synthesis.isSpeaking
+    ? { dot: styles.dotPurple, label: "Interviewer speaking" }
+    : submitting
+    ? { dot: styles.dotAmber, label: "Evaluating answer" }
+    : recognition.isListening
+    ? { dot: styles.dotGreen, label: "Listening" }
+    : { dot: styles.dotIdle, label: "Ready" };
+
   return (
     <div className={styles.page}>
-      <ProgressBar topics={topics} currentIndex={currentIndex} scores={scores} />
+      <header className={styles.topbar}>
+        <div className={styles.topbarInner}>
+          <div className={styles.brandRow}>
+            <button
+              type="button"
+              className={styles.exitBtn}
+              onClick={() => navigate("/")}
+              aria-label="Exit interview"
+            >
+              ←
+            </button>
+            <div>
+              <div className={styles.brandTitle}>Live Interview</div>
+              <div className={styles.brandSub}>
+                {MODE_LABEL[session.mode] || session.mode} · {session.role || "Practice"}
+              </div>
+            </div>
+          </div>
 
-      <button
-        type="button"
-        className={styles.sidebarToggle}
-        onClick={() => setSidebarOpen((v) => !v)}
-      >
-        {sidebarOpen ? "Hide Scores" : "Show Scores"}
-      </button>
+          <div className={styles.topMeta}>
+            <div className={styles.metaPill}>
+              <span className={styles.metaLabel}>Topic</span>
+              <span className={styles.metaValue}>{currentTopic || "—"}</span>
+            </div>
+            <div className={styles.metaPill}>
+              <span className={styles.metaLabel}>Progress</span>
+              <span className={styles.metaValue}>
+                {Math.min(currentIndex + 1, topics.length)} / {topics.length}
+              </span>
+            </div>
+            <div className={styles.metaPill}>
+              <span className={styles.metaLabel}>Elapsed</span>
+              <span className={styles.metaValue}>{fmt(elapsed)}</span>
+            </div>
+            <div className={`${styles.statusPill}`}>
+              <span className={`${styles.statusDot} ${liveStatus.dot}`} />
+              <span>{liveStatus.label}</span>
+            </div>
+          </div>
 
-      <div className={styles.layout}>
-        <div className={styles.leftCol}>
-          <AiAvatar isSpeaking={synthesis.isSpeaking} />
+          <button
+            type="button"
+            className={styles.sidebarToggle}
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-pressed={sidebarOpen}
+          >
+            {sidebarOpen ? "Hide scores" : "Show scores"}
+          </button>
         </div>
 
-        <div className={styles.centerCol}>
+        <ProgressBar topics={topics} currentIndex={currentIndex} scores={scores} />
+      </header>
+
+      <div className={styles.layout}>
+        <aside className={styles.leftCol}>
+          <div className={styles.avatarCard}>
+            <AiAvatar isSpeaking={synthesis.isSpeaking} />
+            <div className={styles.avatarName}>AI Interviewer</div>
+            <div className={styles.avatarRole}>
+              {MODE_LABEL[session.mode] || "Practice"} round
+            </div>
+            <div className={styles.avatarStatus}>
+              <span className={`${styles.statusDot} ${liveStatus.dot}`} />
+              <span>{liveStatus.label}</span>
+            </div>
+          </div>
+
+          <div className={styles.tipsCard}>
+            <div className={styles.tipsTitle}>Pro tips</div>
+            <ul className={styles.tipsList}>
+              <li>Use the STAR framework: Situation, Task, Action, Result.</li>
+              <li>Pause to think — silence is fine, rambling isn't.</li>
+              <li>Quantify outcomes when you can ("cut p95 by 38%").</li>
+            </ul>
+          </div>
+        </aside>
+
+        <main className={styles.centerCol}>
           {error && (
             <div className={styles.errorBanner}>
               <span>{error}</span>
@@ -167,19 +280,23 @@ export default function InterviewScreen() {
             </div>
           )}
 
-          <ChatWindow messages={messages} />
+          <div className={styles.chatWrap}>
+            <ChatWindow messages={messages} />
+          </div>
 
-          <VoiceInput
-            onSubmit={handleSubmit}
-            disabled={submitting}
-            status={inputStatus}
-            voiceEnabled={voiceEnabled}
-            isAiSpeaking={synthesis.isSpeaking}
-            recognition={recognition}
-          />
-        </div>
+          <div className={styles.inputDock}>
+            <VoiceInput
+              onSubmit={handleSubmit}
+              disabled={submitting}
+              status={inputStatus}
+              voiceEnabled={voiceEnabled}
+              isAiSpeaking={synthesis.isSpeaking}
+              recognition={recognition}
+            />
+          </div>
+        </main>
 
-        <div
+        <aside
           className={`${styles.rightCol} ${!sidebarOpen ? styles.rightColCollapsed : ""}`}
         >
           <ScoreSidebar
@@ -187,7 +304,7 @@ export default function InterviewScreen() {
             scores={scores}
             currentIndex={currentIndex}
           />
-        </div>
+        </aside>
       </div>
 
       {toast && (

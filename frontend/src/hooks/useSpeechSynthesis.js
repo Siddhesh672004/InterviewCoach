@@ -51,7 +51,18 @@ export function useSpeechSynthesis() {
       };
 
       utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
+      // Chrome occasionally drops a speak() that lands in the same tick as
+      // cancel(). A microtask defer fixes the very first utterance of the
+      // session, which is exactly the case where users complain "the AI
+      // didn't read the first question".
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch {
+          setIsSpeaking(false);
+          onEnd();
+        }
+      }, 60);
     },
     [voices]
   );

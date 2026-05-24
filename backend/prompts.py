@@ -70,13 +70,24 @@ Candidate profile (may be partial):
 Job description summary (may be partial):
 {jd_summary}
 
-Mode guidance:
+CRITICAL — mode rules (follow exactly, never mix lanes):
 - "quick" / "technical": ask a {difficulty}-level technical question on {topic}.
-- "resume_driven": ask a question that probes a specific project or skill from the candidate's resume relevant to {topic}.
-- "jd_targeted": ask a question rooted in a specific requirement from the JD relevant to {topic}.
-- "hr_behavioral": ask a behavioral / situational question on {topic} (motivation, conflict, leadership, growth, decision-making).
+  Do NOT ask behavioral or culture-fit questions in these modes.
+- "resume_driven": ask a question that probes a specific project, role, or skill
+  drawn from the candidate's resume above and tied to {topic}. If the resume
+  summary is empty, fall back to a technical question on {topic}.
+- "jd_targeted": ask a question rooted in a specific requirement from the JD
+  summary above and tied to {topic}. If the JD summary is empty, fall back to
+  a technical question on {topic}.
+- "hr_behavioral": ask ONLY a behavioral, situational, motivational, or
+  culture-fit question on {topic}. Use the STAR framing (situation, task,
+  action, result) when natural. NEVER ask coding, algorithmic, system-design,
+  framework-syntax, or any other technical knowledge question in this mode —
+  even if {topic} sounds technical, reframe it behaviorally (e.g. for topic
+  "System Design" ask about a time they influenced an architectural decision,
+  not how to design a system). No code. No definitions. No "what is X".
 
-Rules:
+Output rules:
 - Ask exactly ONE question.
 - Do not give hints. Do not number it. Do not add preamble.
 - Output only the question text.
@@ -98,9 +109,11 @@ Candidate profile (may be partial):
 Job description summary (may be partial):
 {jd_summary}
 
-Ask ONE probing follow-up that targets the specific gap. Match the mode tone:
-- behavioral: ask for a concrete example or measurable outcome.
-- technical / jd / resume: ask for the concept they missed or the trade-off they ignored.
+Ask ONE probing follow-up that targets the specific gap. Stay in the mode's lane:
+- "hr_behavioral": ask for a concrete example, measurable outcome, or what they
+  learned. NEVER pivot to a technical question.
+- "technical" / "quick" / "jd_targeted" / "resume_driven": ask for the concept
+  they missed, the trade-off they ignored, or a deeper technical detail.
 
 Output only the follow-up question — no preamble, no quotes.
 """

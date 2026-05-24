@@ -19,11 +19,11 @@ export const checkHealth = () => api.get("/health").then((r) => r.data);
 export const uploadResume = (file) => {
   const form = new FormData();
   form.append("file", file);
+  // Do NOT set Content-Type manually — axios must set it so the multipart
+  // boundary is included (e.g. multipart/form-data; boundary=----xyz).
+  // Without the boundary the server cannot parse the body.
   return api
-    .post("/upload-resume", form, {
-      headers: { "Content-Type": "multipart/form-data" },
-      timeout: 90000,
-    })
+    .post("/upload-resume", form, { timeout: 90000 })
     .then((r) => r.data);
 };
 

@@ -6,12 +6,19 @@ dict keyed by session_id; lost on restart (acceptable per PRD §13).
 
 v2 adds resume upload + JD parsing endpoints and threads mode/resume/jd into
 state at session creation time.
+
+Resilience: every endpoint catches unexpected exceptions and returns a clean
+JSON error so the browser always receives proper CORS headers — a 500 with
+no body would otherwise look like a CORS failure to the user.
 """
 import os
 import uuid
+import logging
+import traceback
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from models import (
     StartRequest,
@@ -45,11 +52,23 @@ load_dotenv()
 
 app = FastAPI(title="Interview Coach API", version="2.0.0")
 
-ALLOWED_ORIGINS = [
-    o.strip()
-    for o in os.getenv("ALLOWED_ORIGIN", "http://localhost:3000").split(",")
-    if o.strip()
+# In development allow all localhost origins regardless of port so that
+# Vite (3000/5173), the Swagger UI, and any other local client all work.
+# In production set ALLOWED_ORIGIN to the exact deployed frontend URL.
+_raw_origins = os.getenv("ALLOWED_ORIGIN", "http://localhost:3000")
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
+# Always add common local dev ports so a port mismatch never causes a CORS block
+_LOCAL_DEV = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
 ]
+for _o in _LOCAL_DEV:
+    if _o not in ALLOWED_ORIGINS:
+        ALLOWED_ORIGINS.append(_o)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -57,6 +76,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+logger = logging.getLogger("interview-coach")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Catch-all so unexpected crashes still return a JSON body.
+
+    Without this, a raw exception bypasses the CORS middleware on the way out
+    and the browser reports it as a CORS failure instead of a 500.
+    """
+    logger.error("Unhandled error on %s %s: %s\n%s",
+                 request.method, request.url.path, exc, traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {type(exc).__name__}: {exc}"},
+    )
 
 sessions: dict[str, InterviewState] = {}
 
@@ -95,7 +132,14 @@ async def upload_resume(file: UploadFile = File(...)):
             detail="Could not extract enough text from this resume. Try a different file.",
         )
 
-    summary = analyze_resume(text)
+    # LLM analysis is best-effort: if Groq isn't configured or fails, we still
+    # return the parsed text so the user can continue with the interview.
+    try:
+        summary = analyze_resume(text) or {}
+    except Exception as e:
+        logger.warning("Resume analysis failed (continuing with empty summary): %s", e)
+        summary = {}
+
     return ResumeUploadResponse(resume_text=text, resume_summary=summary, chars=len(text))
 
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useInterview } from "../App.jsx";
 import {
@@ -245,6 +245,11 @@ export default function SetupScreen() {
     setError("");
     setSubmitting(true);
     try {
+      // Per-mode isolation: only forward context the mode actually uses, so
+      // a stale resume from an earlier session never leaks into a Quick or
+      // HR run. App.jsx clears state on reset, but this is the safety net.
+      const useResume = mode === "resume_driven";
+      const useJd = mode === "jd_targeted";
       const payload = {
         role,
         difficulty: difficulty.toLowerCase(),
@@ -253,10 +258,10 @@ export default function SetupScreen() {
         voice_enabled: voiceEnabled,
         speech_rate: speechRate,
         mode,
-        resume_text: resumeData?.resume_text || null,
-        resume_summary: resumeData?.resume_summary || null,
-        jd_text: jdData?.jd_text || null,
-        jd_summary: jdData?.jd_summary || null,
+        resume_text: useResume ? resumeData?.resume_text || null : null,
+        resume_summary: useResume ? resumeData?.resume_summary || null : null,
+        jd_text: useJd ? jdData?.jd_text || null : null,
+        jd_summary: useJd ? jdData?.jd_summary || null : null,
       };
       const data = await startInterview(payload);
       setSetupConfig(payload);

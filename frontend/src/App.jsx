@@ -27,17 +27,11 @@ export default function App() {
     setSession(null);
     setSetupConfig(null);
     setFinalReport(null);
-    // Intentionally keep resumeData and jdData so the user can run another
-    // interview with the same context without re-uploading.
-  };
-
-  const fullReset = () => {
-    setSession(null);
-    setSetupConfig(null);
-    setFinalReport(null);
     setResumeData(null);
     setJdData(null);
   };
+
+  const fullReset = reset;
 
   return (
     <InterviewContext.Provider

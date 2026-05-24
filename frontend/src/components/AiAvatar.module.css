@@ -2,11 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 24px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  gap: 14px;
+  width: 100%;
 }
 
 .bars {
@@ -14,14 +11,20 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 80px;
+  height: 90px;
   width: 100%;
+  padding: 12px 18px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(127, 119, 221, 0.18), transparent 70%),
+    var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
 }
 
 .bar {
   width: 8px;
-  height: 12px;
-  background: var(--text-muted);
+  height: 14px;
+  background: rgba(127, 119, 221, 0.55);
   border-radius: 4px;
   transition: height 0.2s ease, background 0.2s ease;
 }
@@ -38,12 +41,13 @@
 .speaking .bar:nth-child(5) { animation-delay: 0s; }
 
 @keyframes wave {
-  0%, 100% { height: 12px; }
-  50% { height: 56px; }
+  0%, 100% { height: 14px; }
+  50%      { height: 64px; }
 }
 
 .status {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 12.5px;
+  color: var(--text-muted);
   text-align: center;
+  margin: 0;
 }
