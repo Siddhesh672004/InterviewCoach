@@ -1,6 +1,6 @@
 # Adaptive Mock Interview Coach
 
-> An AI-powered, voice-enabled mock interview platform that adapts to your resume, the job you're chasing, and how you actually answer — built with FastAPI + LangGraph on the backend and React + Vite on the frontend, powered by free Groq Llama 3.3 70B inference.
+> An AI-powered, voice-enabled mock interview platform that adapts to your resume, the job you're chasing, and how you actually answer — built with FastAPI + LangGraph on the backend and React + Vite on the frontend along  with Tailwind CSS, powered by free Groq Llama 3.3 70B inference.
 
 ---
 
